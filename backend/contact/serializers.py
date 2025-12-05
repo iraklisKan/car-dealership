@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.core.validators import EmailValidator, RegexValidator
 from .models import ContactMessage
 
 
@@ -22,6 +23,45 @@ class ContactMessageSerializer(serializers.ModelSerializer):
             'created_at',
         ]
         read_only_fields = ['id', 'status', 'created_at']
+    
+    def validate_name(self, value):
+        """Validate name field."""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Name cannot be empty.")
+        if len(value.strip()) < 2:
+            raise serializers.ValidationError("Name must be at least 2 characters.")
+        if len(value) > 100:
+            raise serializers.ValidationError("Name must be less than 100 characters.")
+        return value.strip()
+    
+    def validate_email(self, value):
+        """Validate email field."""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Email cannot be empty.")
+        validator = EmailValidator(message="Enter a valid email address.")
+        validator(value)
+        return value.strip().lower()
+    
+    def validate_phone(self, value):
+        """Validate phone field."""
+        if value:
+            # Remove spaces and common separators
+            cleaned = value.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+            if not cleaned.isdigit() and not cleaned.startswith('+'):
+                raise serializers.ValidationError("Phone number must contain only digits, spaces, and + for country code.")
+            if len(cleaned) < 8:
+                raise serializers.ValidationError("Phone number must be at least 8 digits.")
+        return value
+    
+    def validate_message(self, value):
+        """Validate message field."""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Message cannot be empty.")
+        if len(value.strip()) < 10:
+            raise serializers.ValidationError("Message must be at least 10 characters.")
+        if len(value) > 2000:
+            raise serializers.ValidationError("Message must be less than 2000 characters.")
+        return value.strip()
     
     def get_car_details(self, obj):
         """Get basic car details if linked to a car."""

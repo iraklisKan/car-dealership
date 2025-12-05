@@ -5,18 +5,20 @@ services:
   db:
     image: postgres:16-alpine
     container_name: car_dealership_db
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: ${DB_NAME:-car_dealership}
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     networks:
       - car_dealership_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,23 +36,34 @@ services:
       - media_volume:/app/media
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - DEBUG=${DEBUG:-True}
-      - SECRET_KEY=${SECRET_KEY:-django-insecure-change-this-in-production}
-      - DB_NAME=${DB_NAME:-car_dealership}
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD:-postgres}
-      - DB_HOST=db
-      - DB_PORT=5432
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
-      - CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - EMAIL_BACKEND=${EMAIL_BACKEND}
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_USE_TLS=${EMAIL_USE_TLS}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
     depends_on:
       db:
         condition: service_healthy
     networks:
       - car_dealership_network
 
-  # React Frontend (Development)
+  # React Frontend
   frontend:
     build:
       context: ./frontend
@@ -58,8 +71,10 @@ services:
     container_name: car_dealership_frontend
     ports:
       - "3000:80"
+    env_file:
+      - .env
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=${VITE_API_URL}
     depends_on:
       - backend
     networks:
@@ -69,9 +84,11 @@ services:
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: car-dealership-pgadmin
+    env_file:
+      - .env
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@cardealership.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
       - "5050:80"
@@ -82,6 +99,22 @@ services:
     volumes:
       - pgadmin_data:/var/lib/pgadmin
 
+  # Optional: Redis Cache (uncomment to enable)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: car_dealership_redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - car_dealership_network
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
 volumes:
   postgres_data:
     driver: local
@@ -91,6 +124,8 @@ volumes:
     driver: local
   pgadmin_data:
     driver: local
+  # redis_data:
+  #   driver: local
 
 networks:
   car_dealership_network:

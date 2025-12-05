@@ -1,6 +1,88 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from '../api/axios';
 
 function Contact() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+  
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    // Phone validation (optional but must be valid if provided)
+    if (formData.phone && formData.phone.trim()) {
+      const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+      if (!phoneRegex.test(formData.phone)) {
+        newErrors.phone = 'Please enter a valid phone number';
+      }
+    }
+    
+    // Message validation
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitStatus(null);
+    
+    if (!validateForm()) {
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      await axios.post('/contact/', formData);
+      setSubmitStatus({ type: 'success', message: 'Thank you! Your message has been sent successfully.' });
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setErrors({});
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to send message. Please try again.';
+      setSubmitStatus({ type: 'error', message: errorMessage });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const contactInfo = [
     {
       icon: 'location',
@@ -145,7 +227,7 @@ function Contact() {
           </div>
 
           {/* Business Hours Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 lg:p-10 fade-in" style={{ animationDelay: '0.5s' }}>
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 lg:p-10 fade-in mb-12" style={{ animationDelay: '0.5s' }}>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8">
               <div className="flex items-center mb-4 sm:mb-0">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary-100 rounded-2xl flex items-center justify-center mr-4">
@@ -191,6 +273,143 @@ function Contact() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Contact Form */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 lg:p-10 fade-in" style={{ animationDelay: '0.6s' }}>
+            <div className="flex items-center mb-6 sm:mb-8">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-accent-100 rounded-2xl flex items-center justify-center mr-4">
+                <svg
+                  className="w-6 h-6 sm:w-7 sm:h-7 text-accent-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Send Us a Message
+              </h2>
+            </div>
+
+            {submitStatus && (
+              <div className={`mb-6 p-4 rounded-lg ${
+                submitStatus.type === 'success' 
+                  ? 'bg-green-50 border border-green-200 text-green-800' 
+                  : 'bg-red-50 border border-red-200 text-red-800'
+              }`}>
+                {submitStatus.message}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
+                      errors.name ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="John Doe"
+                  />
+                  {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="john@example.com"
+                  />
+                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Phone (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
+                      errors.phone ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="99 123456"
+                  />
+                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-2">
+                    Subject (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                    placeholder="Inquiry about..."
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
+                  Message <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="6"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
+                    errors.message ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Tell us how we can help you..."
+                ></textarea>
+                {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-primary-600 to-accent-600 text-white font-bold py-4 px-8 rounded-lg hover:from-primary-700 hover:to-accent-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Sending...' : 'Send Message'}
+                </button>
+              </div>
+            </form>
           </div>
           </div>
         </div>

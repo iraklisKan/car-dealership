@@ -8,6 +8,7 @@ function CarList() {
   const [searchParams] = useSearchParams();
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'grid' or 'list'
   const [sortBy, setSortBy] = useState('newest');
   const [pagination, setPagination] = useState({
@@ -22,6 +23,7 @@ function CarList() {
 
   const fetchCars = async () => {
     setLoading(true);
+    setError(null);
     try {
       // Build query string from search params
       const queryString = searchParams.toString();
@@ -45,6 +47,7 @@ function CarList() {
       setCars(sortCars(fetchedCars, sortBy));
     } catch (error) {
       console.error('Error fetching cars:', error);
+      setError('Failed to load cars. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -76,6 +79,7 @@ function CarList() {
     if (!url) return;
     
     setLoading(true);
+    setError(null);
     try {
       const response = await axios.get(url);
       setCars(response.data.results);
@@ -87,6 +91,7 @@ function CarList() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error('Error fetching page:', error);
+      setError('Failed to load page. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -166,6 +171,13 @@ function CarList() {
 
           {/* Right Content - Car Grid */}
           <main className="flex-1">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded mb-4">
+                <p>{error}</p>
+              </div>
+            )}
+            
             {/* Results */}
             {loading ? (
               <div className="flex justify-center items-center py-20">

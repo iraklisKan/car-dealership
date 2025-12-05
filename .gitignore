@@ -61,11 +61,17 @@ coverage.xml
 
 # Environment Variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+!.env.production.example
 # Keep .env.example for documentation
+
+# Configuration files with secrets
+config.local.yml
+secrets.yaml
+secrets.yml
+.secrets
+secrets.txt
 
 # IDEs
 .vscode/
@@ -84,6 +90,8 @@ Thumbs.db
 # Docker
 *.pid
 docker-compose.override.yml
+docker-compose.*.yml
+!docker-compose.yml
 
 # Database
 *.sql
@@ -94,8 +102,15 @@ postgres_data/
 *.pem
 *.key
 *.cert
+*.p12
+*.pfx
+*.jks
+*.keystore
 secrets.yaml
 secrets.yml
+.secrets
+credentials.json
+service-account*.json
 
 # Logs
 logs/

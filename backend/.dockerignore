@@ -1,0 +1,89 @@
+# Git
+.git
+.gitignore
+.gitattributes
+README.md
+SECURITY.md
+
+# Environment files
+.env
+.env.*
+!.env.example
+*.env
+config.local.yml
+secrets.*
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+coverage.xml
+nosetests.xml
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+*.bak
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Database files
+*.sql
+*.sqlite
+*.db
+postgres_data/
+
+# Logs
+*.log
+logs/
+
+# Media (for production, media should be separate)
+media/
+
+# Static files (collected during build)
+staticfiles/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Sensitive files
+*.pem
+*.key
+*.cert
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+
+# Node modules (if any)
+node_modules/

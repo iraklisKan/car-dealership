@@ -22,6 +22,8 @@ function SearchBar({ initialFilters = {}, compact = false }) {
   const [availableBodyTypes, setAvailableBodyTypes] = useState([]);
   const [availableTransmissions, setAvailableTransmissions] = useState([]);
   const [allCars, setAllCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchCars();
@@ -32,6 +34,8 @@ function SearchBar({ initialFilters = {}, compact = false }) {
   }, [filters.brand, allCars]);
 
   const fetchCars = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.get('/cars/');
       const cars = response.data.results || response.data;
@@ -58,6 +62,9 @@ function SearchBar({ initialFilters = {}, compact = false }) {
       setAvailableTransmissions(transmissions);
     } catch (error) {
       console.error('Error fetching cars:', error);
+      setError('Failed to load filter options. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 

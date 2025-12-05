@@ -1,0 +1,38 @@
+# Car Dealership Application Configuration
+# This file references environment variables from .env
+# Docker Compose will use this configuration
+
+app:
+  name: car-dealership
+  environment: ${DJANGO_SETTINGS_MODULE:-car_dealership.settings.development}
+  
+django:
+  secret_key: ${SECRET_KEY}
+  debug: ${DEBUG:-True}
+  allowed_hosts: ${ALLOWED_HOSTS}
+  cors_origins: ${CORS_ALLOWED_ORIGINS}
+  
+database:
+  engine: postgresql
+  name: ${DB_NAME}
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  host: ${DB_HOST}
+  port: ${DB_PORT}
+  
+email:
+  backend: ${EMAIL_BACKEND}
+  host: ${EMAIL_HOST}
+  port: ${EMAIL_PORT}
+  use_tls: ${EMAIL_USE_TLS}
+  user: ${EMAIL_HOST_USER}
+  password: ${EMAIL_HOST_PASSWORD}
+  from_email: ${DEFAULT_FROM_EMAIL}
+  admin_email: ${ADMIN_EMAIL}
+  
+pgadmin:
+  email: ${PGADMIN_EMAIL}
+  password: ${PGADMIN_PASSWORD}
+  
+frontend:
+  api_url: ${VITE_API_URL}
