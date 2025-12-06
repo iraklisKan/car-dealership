@@ -57,6 +57,8 @@ class CarAdmin(admin.ModelAdmin):
     
     list_editable = ['is_featured', 'is_available']
     
+    actions = ['delete_selected']  # Enable bulk delete action
+    
     fieldsets = (
         ('Basic Information', {
             'fields': ('brand', 'model', 'year', 'price', 'condition')
@@ -74,6 +76,13 @@ class CarAdmin(admin.ModelAdmin):
     )
     
     readonly_fields = ['created_at', 'updated_at']
+    
+    def delete_selected(self, request, queryset):
+        """Custom delete action with confirmation."""
+        deleted_count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f'Successfully deleted {deleted_count} car(s).')
+    delete_selected.short_description = "Delete selected cars"
 
 
 @admin.register(CarImage)
@@ -85,8 +94,17 @@ class CarImageAdmin(admin.ModelAdmin):
     search_fields = ['car__brand', 'car__model', 'caption']
     list_editable = ['is_primary', 'order']
     
+    actions = ['delete_selected']  # Enable bulk delete action
+    
     def image_preview(self, obj):
         if obj.image:
             return format_html('<img src="{}" style="max-height: 100px; max-width: 150px;" />', obj.image.url)
         return "No image"
     image_preview.short_description = 'Preview'
+    
+    def delete_selected(self, request, queryset):
+        """Custom delete action with confirmation."""
+        deleted_count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f'Successfully deleted {deleted_count} image(s).')
+    delete_selected.short_description = "Delete selected images"

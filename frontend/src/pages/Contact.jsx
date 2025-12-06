@@ -172,7 +172,7 @@ function Contact() {
                 Get In <span className="text-gradient bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-accent-400">Touch</span>
               </h1>
               <p className="text-lg sm:text-xl text-gray-200 max-w-2xl mx-auto px-4">
-                Have questions or ready to schedule a test drive? Choose your preferred way to reach us!
+                Have questions or ready to purchase your new car? Choose your preferred way to reach us!
               </p>
             </div>
           </div>

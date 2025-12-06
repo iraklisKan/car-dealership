@@ -6,24 +6,25 @@ import CarCard from '../components/CarCard';
 
 function Home() {
   const [latestCars, setLatestCars] = useState([]);
+  const [featuredCars, setFeaturedCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const heroSlides = [
     {
-      image: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=1920&q=80',
+      image: '/images/mainImage1.png',
       title: 'PERFECT CAR FOR YOU',
-      subtitle: 'We have more than a thousand cars for you to choose.',
+      subtitle: 'Possibility for direct financing without a bank',
     },
     {
-      image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=1920&q=80',
+      image: '/images/mainimage2.png',
       title: 'DRIVE EASY PAY EASY',
       subtitle: '35% advance only - 24 months flexibility',
     },
     {
       image: 'https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=1920&q=80',
       title: 'PREMIUM QUALITY CARS',
-      subtitle: 'Find your dream car at the best price',
+      subtitle: 'We accept pre-orders from Japan and England.',
     },
   ];
 
@@ -48,10 +49,30 @@ function Home() {
 
   const fetchLatestCars = async () => {
     try {
-      const response = await axios.get('/cars/latest/');
-      setLatestCars(response.data);
+      // Fetch both featured and latest cars
+      const [featuredResponse, latestResponse] = await Promise.all([
+        axios.get('/cars/featured/'),
+        axios.get('/cars/latest/')
+      ]);
+      
+      const featured = featuredResponse.data || [];
+      const latest = latestResponse.data || [];
+      
+      setFeaturedCars(featured);
+      
+      // If we have featured cars, fill remaining spots with latest (up to 10 total)
+      if (featured.length > 0) {
+        const remainingSlots = Math.max(0, 10 - featured.length);
+        // Filter out any latest cars that are already in featured
+        const featuredIds = new Set(featured.map(car => car.id));
+        const filteredLatest = latest.filter(car => !featuredIds.has(car.id));
+        setLatestCars(filteredLatest.slice(0, remainingSlots));
+      } else {
+        // No featured cars, show all latest
+        setLatestCars(latest);
+      }
     } catch (error) {
-      console.error('Error fetching latest cars:', error);
+      console.error('Error fetching cars:', error);
     } finally {
       setLoading(false);
     }
@@ -133,16 +154,17 @@ function Home() {
         </div>
       </section>
 
-      {/* Latest Cars Section */}
+      {/* Featured/Latest Cars Section */}
       <section className="py-16 bg-white">
         <div className="container-custom">
           <div className="text-center mb-12 fade-in">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Newest Releases
+              {featuredCars.length > 0 ? 'Featured & Latest Vehicles' : 'Newest Releases'}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Check out our newest additions to the showroom. These premium
-              vehicles just arrived and are ready for you.
+              {featuredCars.length > 0 
+                ? `${featuredCars.length} featured vehicle${featuredCars.length > 1 ? 's' : ''} plus our newest additions!` 
+                : 'Check out our newest additions!'}
             </p>
           </div>
 
@@ -153,6 +175,11 @@ function Home() {
           ) : (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* Featured cars first */}
+                {featuredCars.map((car) => (
+                  <CarCard key={car.id} car={car} />
+                ))}
+                {/* Then latest cars to fill remaining spots */}
                 {latestCars.map((car) => (
                   <CarCard key={car.id} car={car} />
                 ))}

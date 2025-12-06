@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django_filters',
     
     # Local apps
+    'car_dealership',  # Add main app for custom admin
     'cars',
     'contact',
 ]
@@ -49,7 +50,10 @@ ROOT_URLCONF = 'car_dealership.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'car_dealership', 'templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'car_dealership', 'templates'),
+            os.path.join(BASE_DIR, 'templates'),  # Add templates directory
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,9 +106,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Additional static files directories
-STATICFILES_DIRS = []
 
 # Static files finders
 STATICFILES_FINDERS = [
