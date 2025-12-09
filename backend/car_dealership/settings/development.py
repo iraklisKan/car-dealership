@@ -37,5 +37,15 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 
-# Development-specific logging
+# Development-specific logging - use console only
+LOGGING['handlers'] = {
+    'console': {
+        'level': 'INFO',
+        'class': 'logging.StreamHandler',
+        'formatter': 'verbose',
+    },
+}
+LOGGING['loggers']['django']['handlers'] = ['console']
 LOGGING['loggers']['django']['level'] = 'DEBUG'
+LOGGING['loggers']['cars']['handlers'] = ['console']
+LOGGING['loggers']['contact']['handlers'] = ['console']
