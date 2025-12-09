@@ -22,7 +22,7 @@ function Home() {
       subtitle: '35% advance only - 24 months flexibility',
     },
     {
-      image: 'https://images.unsplash.com/photo-1619405399517-d7fce0f13302?w=1920&q=80',
+      image: '/images/mainImage3.png',
       title: 'PREMIUM QUALITY CARS',
       subtitle: 'We accept pre-orders from Japan and England.',
     },
@@ -92,7 +92,7 @@ function Home() {
           >
             {/* Background Image */}
             <div 
-              className="absolute inset-0 bg-cover bg-center"
+              className="absolute inset-0 bg-cover bg-bottom"
               style={{ backgroundImage: `url(${slide.image})` }}
             >
               <div className="absolute inset-0 bg-black bg-opacity-40"></div>
