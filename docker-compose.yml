@@ -29,7 +29,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: car_dealership_backend
-    command: sh -c "python manage.py migrate && python manage.py loaddata cars/fixtures/initial_cars.json || true && gunicorn car_dealership.wsgi:application --bind 0.0.0.0:8000 --workers 3"
+    command: sh -c "python manage.py collectstatic --noinput && python manage.py migrate && python manage.py loaddata cars/fixtures/initial_cars.json || true && gunicorn car_dealership.wsgi:application --bind 0.0.0.0:8000 --workers 3"
     volumes:
       - ./backend:/app
       - static_volume:/app/staticfiles
