@@ -3,6 +3,17 @@
 
 $ErrorActionPreference = "Stop"
 
+# Load environment variables
+if (Test-Path ".env") {
+    Get-Content ".env" | ForEach-Object {
+        if ($_ -match '^\s*([^#][^=]*?)\s*=\s*(.*)$') {
+            $name = $matches[1]
+            $value = $matches[2]
+            [Environment]::SetEnvironmentVariable($name, $value, "Process")
+        }
+    }
+}
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "Car Dealership Full Backup" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -77,6 +88,59 @@ if ($LASTEXITCODE -eq 0) {
         $mediaCount = (Get-ChildItem -Path $MEDIA_BACKUP_DIR -Filter "*.zip").Count
         Write-Host "[SUCCESS] Cleanup completed" -ForegroundColor Green
         Write-Host "Retained: $dbCount database backup(s), $mediaCount media backup(s)" -ForegroundColor Gray
+        
+        # Upload to AWS S3 if configured
+        $awsKeyId = $env:AWS_ACCESS_KEY_ID
+        $awsSecret = $env:AWS_SECRET_ACCESS_KEY
+        $s3Bucket = $env:AWS_S3_BUCKET_NAME
+        $awsRegion = $env:AWS_REGION
+        
+        if ($awsKeyId -and $awsSecret -and $s3Bucket) {
+            Write-Host ""
+            Write-Host "[INFO] Syncing backups to AWS S3..." -ForegroundColor Yellow
+            
+            # Check if AWS CLI is installed
+            $awsInstalled = Get-Command aws -ErrorAction SilentlyContinue
+            if ($awsInstalled) {
+                # Configure AWS CLI
+                aws configure set aws_access_key_id $awsKeyId 2>$null
+                aws configure set aws_secret_access_key $awsSecret 2>$null
+                aws configure set default.region $awsRegion 2>$null
+                
+                # Sync database backups
+                Write-Host "  - Uploading database backup..." -ForegroundColor Gray
+                aws s3 cp $BACKUP_FILE "s3://$s3Bucket/database/" 2>&1 | Out-Null
+                
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "  ✓ Database backup uploaded" -ForegroundColor Green
+                    
+                    # Sync media backups if exists
+                    if (Test-Path $MEDIA_BACKUP_FILE) {
+                        Write-Host "  - Uploading media backup..." -ForegroundColor Gray
+                        aws s3 cp $MEDIA_BACKUP_FILE "s3://$s3Bucket/media/" 2>&1 | Out-Null
+                        
+                        if ($LASTEXITCODE -eq 0) {
+                            Write-Host "  ✓ Media backup uploaded" -ForegroundColor Green
+                        } else {
+                            Write-Host "  ✗ Media backup upload failed" -ForegroundColor Yellow
+                        }
+                    }
+                    
+                    Write-Host "[SUCCESS] Cloud backup completed" -ForegroundColor Green
+                    Write-Host "S3 Location: s3://$s3Bucket/" -ForegroundColor Gray
+                } else {
+                    Write-Host "[WARNING] Failed to upload to S3" -ForegroundColor Yellow
+                    Write-Host "Local backup is safe in: $BACKUP_DIR" -ForegroundColor Gray
+                }
+            } else {
+                Write-Host "[WARNING] AWS CLI not installed, skipping cloud backup" -ForegroundColor Yellow
+                Write-Host "Install: https://awscli.amazonaws.com/AWSCLIV2.msi" -ForegroundColor Gray
+            }
+        } else {
+            Write-Host ""
+            Write-Host "[INFO] AWS S3 not configured, skipping cloud backup" -ForegroundColor Gray
+            Write-Host "To enable: Add AWS credentials to .env file" -ForegroundColor Gray
+        }
         
     } else {
         Write-Host "[ERROR] Backup file is empty" -ForegroundColor Red

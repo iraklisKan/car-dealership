@@ -98,6 +98,9 @@ docker-compose.*.yml
 *.sqlite
 postgres_data/
 
+# Backups
+backups/
+
 # Sensitive files
 *.pem
 *.key
