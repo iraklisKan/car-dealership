@@ -13,7 +13,7 @@ for /f "tokens=1,2 delims==" %%a in (.env) do (
 )
 
 echo ========================================
-echo Car Dealership Database Restore
+echo Car Dealership Full Restore
 echo ========================================
 echo.
 
@@ -21,11 +21,14 @@ REM Check if backup file is provided
 if "%~1"=="" (
     echo [ERROR] No backup file specified
     echo.
-    echo Usage: restore_database.bat ^<backup_file^>
-    echo Example: restore_database.bat backups\database\car_dealership_20251205_030000.sql
+    echo Usage: restore_database.bat ^<backup_file^> [media_backup_file]
+    echo Example: restore_database.bat backups\database\car_dealership_20251205_030000.sql backups\media\media_20251205_030000.zip
     echo.
-    echo Available backups:
+    echo Available database backups:
     dir /b backups\database\*.sql 2>nul
+    echo.
+    echo Available media backups:
+    dir /b backups\media\*.zip 2>nul
     exit /b 1
 )
 
@@ -73,12 +76,30 @@ type "%BACKUP_FILE%" | docker exec -i car_dealership_db psql -U %DB_USER% %DB_NA
 if %errorlevel% equ 0 (
     echo.
     echo [SUCCESS] Database restored successfully!
+    
+    REM Restore media files if provided
+    if not "%~2"=="" (
+        set MEDIA_BACKUP_FILE=%~2
+        if exist "!MEDIA_BACKUP_FILE!" (
+            echo.
+            echo [INFO] Restoring media files...
+            if exist "backend\media" rmdir /s /q "backend\media"
+            mkdir "backend\media"
+            powershell -Command "Expand-Archive -Path '!MEDIA_BACKUP_FILE!' -DestinationPath 'backend\media' -Force"
+            echo [SUCCESS] Media files restored
+        ) else (
+            echo [WARNING] Media backup file not found: !MEDIA_BACKUP_FILE!
+        )
+    ) else (
+        echo [INFO] No media backup specified, skipping media restore
+    )
+    
     echo.
     echo [INFO] Starting backend container...
     docker-compose start backend
     echo.
     echo [SUCCESS] Restore complete!
-    echo Database is now restored from: %BACKUP_FILE%
+    echo Database restored from: %BACKUP_FILE%
 ) else (
     echo.
     echo [ERROR] Restore failed!
