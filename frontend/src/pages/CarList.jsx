@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
 import SearchBar from '../components/SearchBar';
 import CarCard from '../components/CarCard';
+import { CarCardSkeleton, CarCardHorizontalSkeleton } from '../components/LoadingSkeleton';
 
 function CarList() {
   const [searchParams] = useSearchParams();
@@ -180,9 +181,21 @@ function CarList() {
             
             {/* Results */}
             {loading ? (
-              <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-              </div>
+              <>
+                {viewMode === 'grid' ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {[...Array(6)].map((_, i) => (
+                      <CarCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {[...Array(4)].map((_, i) => (
+                      <CarCardHorizontalSkeleton key={i} />
+                    ))}
+                  </div>
+                )}
+              </>
             ) : cars.length > 0 ? (
               <>
                 {/* Car Grid/List */}

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios, { getMediaUrl } from '../api/axios';
+import { CarDetailSkeleton } from '../components/LoadingSkeleton';
+import NotFound from '../components/NotFound';
 
 function CarDetail() {
   const { id } = useParams();
@@ -40,24 +42,19 @@ function CarDetail() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      <div className="min-h-screen">
+        <div className="relative bg-cover bg-center bg-fixed py-8" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')" }}>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/80"></div>
+        </div>
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 -mt-4">
+          <CarDetailSkeleton />
+        </div>
       </div>
     );
   }
 
   if (error || !car) {
-    return (
-      <div className="container-custom py-20 text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Car Not Found</h2>
-        <p className="text-gray-600 mb-6">
-          The vehicle you're looking for doesn't exist or has been removed.
-        </p>
-        <Link to="/cars" className="btn btn-primary">
-          Back to Listings
-        </Link>
-      </div>
-    );
+    return <NotFound />;
   }
 
   return (

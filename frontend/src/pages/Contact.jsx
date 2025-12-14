@@ -1,87 +1,6 @@
-import React, { useState } from 'react';
-import axios from '../api/axios';
+import React from 'react';
 
 function Contact() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
-  });
-  
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
-    }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-    
-    // Phone validation (optional but must be valid if provided)
-    if (formData.phone && formData.phone.trim()) {
-      const phoneRegex = /^[\d\s\-\+\(\)]+$/;
-      if (!phoneRegex.test(formData.phone)) {
-        newErrors.phone = 'Please enter a valid phone number';
-      }
-    }
-    
-    // Message validation
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
-    } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Message must be at least 10 characters';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitStatus(null);
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      await axios.post('/contact/', formData);
-      setSubmitStatus({ type: 'success', message: 'Thank you! Your message has been sent successfully.' });
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
-      setErrors({});
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to send message. Please try again.';
-      setSubmitStatus({ type: 'error', message: errorMessage });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const contactInfo = [
     {
@@ -115,6 +34,14 @@ function Contact() {
       link: 'https://www.facebook.com/profile.php?id=100063609997112',
       linkText: 'Visit Facebook',
       color: 'blue'
+    },
+    {
+      icon: 'instagram',
+      title: 'Instagram',
+      info: 'Follow us on Instagram',
+      link: 'https://www.instagram.com/elautomovil.cy/',
+      linkText: 'Visit Instagram',
+      color: 'pink'
     }
   ];
 
@@ -147,6 +74,11 @@ function Contact() {
       facebook: (
         <path
           d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+        />
+      ),
+      instagram: (
+        <path
+          d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
         />
       )
     };
@@ -185,13 +117,13 @@ function Contact() {
           <div className="max-w-6xl mx-auto">
 
             {/* Contact Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6 mb-12">
             {contactInfo.map((item, index) => (
               <a
                 key={index}
                 href={item.link}
-                target={item.icon === 'location' || item.icon === 'facebook' ? '_blank' : undefined}
-                rel={item.icon === 'location' || item.icon === 'facebook' ? 'noopener noreferrer' : undefined}
+                target={item.icon === 'location' || item.icon === 'facebook' || item.icon === 'instagram' ? '_blank' : undefined}
+                rel={item.icon === 'location' || item.icon === 'facebook' || item.icon === 'instagram' ? 'noopener noreferrer' : undefined}
                 className="scale-in group"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
@@ -199,8 +131,8 @@ function Contact() {
                   <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-${item.color}-100 rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-all duration-300 group-hover:rotate-6`}>
                     <svg
                       className={`w-7 h-7 sm:w-8 sm:h-8 text-${item.color}-600`}
-                      fill={item.icon === 'facebook' ? 'currentColor' : 'none'}
-                      stroke={item.icon === 'facebook' ? 'none' : 'currentColor'}
+                      fill={item.icon === 'facebook' || item.icon === 'instagram' ? 'currentColor' : 'none'}
+                      stroke={item.icon === 'facebook' || item.icon === 'instagram' ? 'none' : 'currentColor'}
                       viewBox="0 0 24 24"
                     >
                       {getIcon(item.icon)}
@@ -275,142 +207,6 @@ function Contact() {
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 lg:p-10 fade-in" style={{ animationDelay: '0.6s' }}>
-            <div className="flex items-center mb-6 sm:mb-8">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-accent-100 rounded-2xl flex items-center justify-center mr-4">
-                <svg
-                  className="w-6 h-6 sm:w-7 sm:h-7 text-accent-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Send Us a Message
-              </h2>
-            </div>
-
-            {submitStatus && (
-              <div className={`mb-6 p-4 rounded-lg ${
-                submitStatus.type === 'success' 
-                  ? 'bg-green-50 border border-green-200 text-green-800' 
-                  : 'bg-red-50 border border-red-200 text-red-800'
-              }`}>
-                {submitStatus.message}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
-                      errors.name ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="John Doe"
-                  />
-                  {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
-                      errors.email ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="john@example.com"
-                  />
-                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Phone (Optional)
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
-                      errors.phone ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="99 123456"
-                  />
-                  {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-semibold text-gray-700 mb-2">
-                    Subject (Optional)
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                    placeholder="Inquiry about..."
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Message <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows="6"
-                  value={formData.message}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all ${
-                    errors.message ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Tell us how we can help you..."
-                ></textarea>
-                {errors.message && <p className="mt-1 text-sm text-red-600">{errors.message}</p>}
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-primary-600 to-accent-600 text-white font-bold py-4 px-8 rounded-lg hover:from-primary-700 hover:to-accent-700 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Sending...' : 'Send Message'}
-                </button>
-              </div>
-            </form>
-          </div>
           </div>
         </div>
       </div>

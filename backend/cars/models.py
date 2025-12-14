@@ -104,7 +104,7 @@ class Car(models.Model):
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='used')
     
     # Description and Images
-    description = models.TextField(max_length=5000)
+    description = models.TextField(max_length=5000, blank=True)
     
     # Features (stored as comma-separated values)
     features = models.TextField(

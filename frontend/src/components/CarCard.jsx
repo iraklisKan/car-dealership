@@ -52,7 +52,7 @@ function CarCard({ car, horizontal = false }) {
             <img
               src={getCurrentImageUrl()}
               alt={car.full_name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              className="w-full h-full object-cover"
               onError={(e) => {
                 e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
               }}
@@ -103,7 +103,7 @@ function CarCard({ car, horizontal = false }) {
             <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
                 <h3 className="text-2xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-                  {car.full_name}
+                  {car.brand.toUpperCase()} {car.model.charAt(0).toUpperCase() + car.model.slice(1)}
                 </h3>
                 <p className="text-3xl font-bold text-primary-600">
                   {formatPrice(car.price)}
@@ -187,7 +187,7 @@ function CarCard({ car, horizontal = false }) {
           <img
             src={getCurrentImageUrl()}
             alt={car.full_name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            className="w-full h-full object-cover"
             onError={(e) => {
               e.target.src = 'https://via.placeholder.com/400x300?text=No+Image';
             }}
@@ -241,7 +241,7 @@ function CarCard({ car, horizontal = false }) {
         <div className="p-4">
           {/* Title */}
           <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-            {car.full_name}
+            {car.brand.toUpperCase()} {car.model.charAt(0).toUpperCase() + car.model.slice(1)}
           </h3>
 
           {/* Price */}
@@ -262,7 +262,7 @@ function CarCard({ car, horizontal = false }) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
               <span>{car.year}</span>

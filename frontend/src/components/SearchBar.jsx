@@ -21,6 +21,7 @@ function SearchBar({ initialFilters = {}, compact = false }) {
   const [availableFuelTypes, setAvailableFuelTypes] = useState([]);
   const [availableBodyTypes, setAvailableBodyTypes] = useState([]);
   const [availableTransmissions, setAvailableTransmissions] = useState([]);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 });
   const [allCars, setAllCars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -60,6 +61,14 @@ function SearchBar({ initialFilters = {}, compact = false }) {
       // Extract unique transmissions
       const transmissions = [...new Set(cars.map(car => car.transmission).filter(Boolean))].sort();
       setAvailableTransmissions(transmissions);
+      
+      // Calculate price range from actual inventory
+      if (cars.length > 0) {
+        const prices = cars.map(car => parseFloat(car.price));
+        const minPrice = Math.floor(Math.min(...prices));
+        const maxPrice = Math.ceil(Math.max(...prices));
+        setPriceRange({ min: minPrice, max: maxPrice });
+      }
     } catch (error) {
       console.error('Error fetching cars:', error);
       setError('Failed to load filter options. Please try again.');
@@ -141,7 +150,7 @@ function SearchBar({ initialFilters = {}, compact = false }) {
           >
             <option value="">All Makes</option>
             {availableBrands.map(brand => (
-              <option key={brand} value={brand}>{brand}</option>
+              <option key={brand} value={brand}>{brand.toUpperCase()}</option>
             ))}
           </select>
         </div>
@@ -159,7 +168,7 @@ function SearchBar({ initialFilters = {}, compact = false }) {
           >
             <option value="">All Models</option>
             {availableModels.map(model => (
-              <option key={model} value={model}>{model}</option>
+              <option key={model} value={model}>{model.charAt(0).toUpperCase() + model.slice(1)}</option>
             ))}
           </select>
         </div>
@@ -193,7 +202,7 @@ function SearchBar({ initialFilters = {}, compact = false }) {
               name="price_min"
               value={filters.price_min}
               onChange={handleChange}
-              placeholder="Min: 9800"
+              placeholder={`Min: €${priceRange.min.toLocaleString()}`}
               className="input text-sm"
             />
             <input
@@ -201,7 +210,7 @@ function SearchBar({ initialFilters = {}, compact = false }) {
               name="price_max"
               value={filters.price_max}
               onChange={handleChange}
-              placeholder="Max: 34000"
+              placeholder={`Max: €${priceRange.max.toLocaleString()}`}
               className="input text-sm"
             />
           </div>
