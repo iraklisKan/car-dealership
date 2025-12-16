@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'car_dealership',  # Add main app for custom admin
     'cars',
     'contact',
+    'analytics',
 ]
 
 MIDDLEWARE = [

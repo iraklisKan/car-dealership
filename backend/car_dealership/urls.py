@@ -16,6 +16,7 @@ urlpatterns = [
     path('secure-admin/', admin.site.urls),  # Changed from 'admin/' for security
     path('api/cars/', include('cars.urls')),
     path('api/contact/', include('contact.urls')),
+    path('api/analytics/', include('analytics.urls')),
     path('health/', HealthCheckView.as_view(), name='health-check'),
 ]
 

@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getMediaUrl } from '../api/axios';
+import { trackCarView } from '../api/analytics';
 
 function CarCard({ car, horizontal = false }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const handleCardClick = () => {
+    trackCarView(car.id, 'card_click');
+  };
   
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -45,7 +50,7 @@ function CarCard({ car, horizontal = false }) {
   // Horizontal layout for list view
   if (horizontal) {
     return (
-      <Link to={`/cars/${car.id}`} className="block">
+      <Link to={`/cars/${car.id}`} className="block" onClick={handleCardClick}>
         <div className="card group flex flex-col md:flex-row overflow-hidden hover:shadow-xl">
           {/* Image */}
           <div className="relative w-full md:w-80 h-56 bg-gray-200 flex-shrink-0 overflow-hidden">
@@ -180,7 +185,7 @@ function CarCard({ car, horizontal = false }) {
 
   // Original vertical card layout
   return (
-    <Link to={`/cars/${car.id}`} className="block scale-in">
+    <Link to={`/cars/${car.id}`} className="block scale-in" onClick={handleCardClick}>
       <div className="card group">
         {/* Image */}
         <div className="relative h-48 bg-gray-200 overflow-hidden">

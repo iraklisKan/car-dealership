@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { trackPageView } from '../api/analytics';
 
 function Contact() {
+
+  useEffect(() => {
+    trackPageView('contact');
+  }, []);
 
   const contactInfo = [
     {

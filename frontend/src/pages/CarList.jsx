@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from '../api/axios';
+import { trackPageView } from '../api/analytics';
 import SearchBar from '../components/SearchBar';
 import CarCard from '../components/CarCard';
 import { CarCardSkeleton, CarCardHorizontalSkeleton } from '../components/LoadingSkeleton';
@@ -19,6 +20,7 @@ function CarList() {
   });
 
   useEffect(() => {
+    trackPageView('car_list');
     fetchCars();
   }, [searchParams]);
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios, { getMediaUrl } from '../api/axios';
+import { trackPageView, trackCarView } from '../api/analytics';
 import { CarDetailSkeleton } from '../components/LoadingSkeleton';
 import NotFound from '../components/NotFound';
 
@@ -13,6 +14,7 @@ function CarDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
+    trackPageView('car_detail');
     fetchCarDetail();
   }, [id]);
 
@@ -20,6 +22,8 @@ function CarDetail() {
     try {
       const response = await axios.get(`/cars/${id}/`);
       setCar(response.data);
+      // Track car detail view
+      trackCarView(id, 'detail_view');
     } catch (error) {
       console.error('Error fetching car details:', error);
       setError('Car not found');

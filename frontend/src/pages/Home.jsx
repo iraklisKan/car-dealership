@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../api/axios';
+import { trackPageView } from '../api/analytics';
 import SearchBar from '../components/SearchBar';
 import CarCard from '../components/CarCard';
 
@@ -29,6 +30,7 @@ function Home() {
   ];
 
   useEffect(() => {
+    trackPageView('home');
     fetchLatestCars();
     
     // Auto-advance slider every 5 seconds
