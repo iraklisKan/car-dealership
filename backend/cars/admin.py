@@ -1,6 +1,62 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django import forms
 from .models import Car, CarImage
+
+
+class ColorWidget(forms.Select):
+    """Custom widget to display color swatches in the admin dropdown."""
+    
+    COLOR_CODES = {
+        'black': '#000000',
+        'white': '#FFFFFF',
+        'silver': '#C0C0C0',
+        'grey': '#808080',
+        'blue': '#0000FF',
+        'red': '#FF0000',
+        'green': '#008000',
+        'yellow': '#FFFF00',
+        'orange': '#FFA500',
+        'brown': '#8B4513',
+        'beige': '#F5F5DC',
+        'gold': '#FFD700',
+        'bronze': '#CD7F32',
+        'purple': '#800080',
+        'pink': '#FFC0CB',
+        'other': '#CCCCCC',
+    }
+    
+    def __init__(self, attrs=None, choices=()):
+        super().__init__(attrs, choices)
+        if attrs is None:
+            attrs = {}
+        attrs['style'] = 'padding-left: 35px;'
+        self.attrs = attrs
+    
+    class Media:
+        css = {
+            'all': ('admin/css/color_widget.css',)
+        }
+    
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        if value:
+            color_code = self.COLOR_CODES.get(value, '#CCCCCC')
+            border = '1px solid #000' if value == 'white' else 'none'
+            option['attrs']['data-color'] = color_code
+            option['attrs']['style'] = f'background: linear-gradient(to right, {color_code} 0%, {color_code} 30px, white 30px);' + (f' border-left: {border};' if value == 'white' else '')
+        return option
+
+
+class CarAdminForm(forms.ModelForm):
+    """Custom form for Car admin with color widget."""
+    
+    class Meta:
+        model = Car
+        exclude = ['vin']
+        widgets = {
+            'color': ColorWidget(),
+        }
 
 
 class CarImageInline(admin.TabularInline):
@@ -21,6 +77,7 @@ class CarImageInline(admin.TabularInline):
 class CarAdmin(admin.ModelAdmin):
     """Admin interface for Car model."""
     
+    form = CarAdminForm
     inlines = [CarImageInline]
     
     list_display = [
@@ -51,7 +108,6 @@ class CarAdmin(admin.ModelAdmin):
     search_fields = [
         'brand',
         'model',
-        'vin',
         'description',
     ]
     
@@ -68,7 +124,7 @@ class CarAdmin(admin.ModelAdmin):
                       'horsepower', 'color', 'doors', 'seats')
         }),
         ('Details', {
-            'fields': ('description', 'features', 'vin')
+            'fields': ('description', 'features')
         }),
         ('Status', {
             'fields': ('is_featured', 'is_available')

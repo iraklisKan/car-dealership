@@ -66,6 +66,25 @@ class Car(models.Model):
         ('certified', 'Certified Pre-Owned'),
     ]
     
+    COLOR_CHOICES = [
+        ('black', 'Black'),
+        ('white', 'White'),
+        ('silver', 'Silver'),
+        ('grey', 'Grey'),
+        ('blue', 'Blue'),
+        ('red', 'Red'),
+        ('green', 'Green'),
+        ('yellow', 'Yellow'),
+        ('orange', 'Orange'),
+        ('brown', 'Brown'),
+        ('beige', 'Beige'),
+        ('gold', 'Gold'),
+        ('bronze', 'Bronze'),
+        ('purple', 'Purple'),
+        ('pink', 'Pink'),
+        ('other', 'Other'),
+    ]
+    
     # Basic Information
     brand = models.CharField(max_length=100, validators=[validate_brand_model])
     model = models.CharField(max_length=100, validators=[validate_brand_model])
@@ -98,7 +117,7 @@ class Car(models.Model):
     horsepower = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(2000)]
     )
-    color = models.CharField(max_length=50, validators=[validate_color])
+    color = models.CharField(max_length=50, choices=COLOR_CHOICES)
     doors = models.IntegerField(validators=[MinValueValidator(2), MaxValueValidator(5)])
     seats = models.IntegerField(validators=[MinValueValidator(2), MaxValueValidator(9)])
     condition = models.CharField(max_length=20, choices=CONDITION_CHOICES, default='used')

@@ -1,0 +1,31 @@
+/* Color widget styling for admin panel */
+select[name="color"] option {
+    padding: 8px 8px 8px 40px !important;
+    min-height: 35px;
+    line-height: 35px;
+}
+
+select[name="color"] {
+    font-size: 14px;
+    padding: 8px 8px 8px 40px !important;
+}
+
+/* Color swatch indicator next to the select */
+.field-color {
+    position: relative;
+}
+
+.field-color::before {
+    content: '';
+    position: absolute;
+    left: 110px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 25px;
+    height: 25px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: var(--selected-color, #fff);
+    pointer-events: none;
+    z-index: 10;
+}

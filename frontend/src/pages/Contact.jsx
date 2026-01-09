@@ -148,7 +148,7 @@ function Contact() {
                     {item.title}
                   </h3>
                   
-                  <p className="text-sm sm:text-base text-gray-600 mb-4 min-h-[3rem] sm:min-h-[3.5rem]">
+                  <p className="text-sm sm:text-base text-gray-600 mb-4 min-h-[3rem] sm:min-h-[3.5rem] break-words">
                     {item.info}
                   </p>
                   
@@ -199,7 +199,7 @@ function Contact() {
               <div className="p-4 sm:p-6 bg-gray-50 rounded-xl hover:bg-primary-50 transition-all duration-300 hover:shadow-md">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-gray-700 text-sm sm:text-base">Saturday</span>
-                  <span className="text-primary-600 font-bold text-sm sm:text-base">10:00 AM - 6:00 PM</span>
+                  <span className="text-primary-600 font-bold text-sm sm:text-base">10:00 AM - 7:00 PM</span>
                 </div>
               </div>
               
