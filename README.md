@@ -157,7 +157,7 @@ DJANGO_SETTINGS_MODULE=car_dealership.settings.development
 
 # Database (PostgreSQL)
 DB_NAME=car_dealership
-DB_USER=postgres
+DB_USER=<dbname>
 DB_PASSWORD=<secure-password>
 DB_HOST=db
 DB_PORT=5432
